@@ -11,6 +11,8 @@ public:
     void runDevice(String info);
     int getPin(){return pin;}
     String getIP(){return ip;}
+    String getState(){return state;}
+    void setState(String newState){state = newState;}
 private:
     String ip = "";
     int pin = 0;
@@ -90,8 +92,8 @@ void interpretCommand(String info){
   }
   else if (value == 'R'){
     char charPreviousCommand = '\0';
+    String tempNum; //For storing pinNumber
     for(int i = 0; i < info.length(); i++){
-        String tempNum; //For storing pinNumber
         char value = info.charAt(i); //Get current char
         if(value >= 'A' && value <= 'Z'){
             switch(value){
@@ -112,7 +114,15 @@ void interpretCommand(String info){
                     for(ConnectedDevice& connectedDevice : connectedDevices){
                       int num = tempNum.toInt();
                       if(connectedDevice.getPin() == num){
-                        //Run whatever you want
+                        String tempState = connectedDevice.getState();
+                        if(connectedDevice.getState() == "OFF"){
+                          connectedDevice.setState("ON");
+                          digitalWrite(connectedDevice.getPin(), HIGH);
+                        }
+                        else{
+                          connectedDevice.setState("OFF");
+                          digitalWrite(connectedDevice.getPin(), LOW);
+                        }
                       }
                     }
                 }
@@ -127,8 +137,8 @@ void interpretCommand(String info){
                 }
             }
         }
-      tempNum = "";
     }
+    tempNum = "";
   }
 }
 
@@ -137,7 +147,7 @@ void setup(){
   interpretCommand("PW123.234.10.5");
   interpretCommand("PW123.234.10.5");
   interpretCommand("PW123.234.10.6");
-  interpretCommand("PM12");
+  interpretCommand("PM25");
   for(ConnectedDevice& connectedDevice : connectedDevices){
     Serial.println("Connected Device IPs:");
     Serial.println(connectedDevice.getIP());
@@ -145,5 +155,8 @@ void setup(){
   }
 }
 void loop(){
-
+  interpretCommand("RM25");
+  delay(2000);
+  interpretCommand("RM25");
+  delay(2000);
 }
