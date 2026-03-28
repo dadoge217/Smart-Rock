@@ -13,9 +13,9 @@ def home():
         mode = request.form['connection_mode']
         ip = request.form['ip']
         if mode == 'motor':
-            ip="M"+ip
+            ip="PM"+ip
         if mode == 'wifi':
-            ip="W"+ip
+            ip="PW"+ip
         print(ip)
         status = "Connected!"
         return render_template('index.html', dstatus = status, dmood = mood, dcomp = companionMode)
