@@ -81,6 +81,7 @@ void ConnectedDevice::connectDevice(String info){ //Format: ConnectionType.ip/pi
 
 void runDevice(String info){
   char charPreviousCommand = '\0';
+  char commandState = '\0';
   String tempNum; //For storing pinNumber
   for(int i = 0; i < info.length(); i++){
       char value = info.charAt(i); //Get current char
@@ -93,10 +94,18 @@ void runDevice(String info){
           case 'W': //WiFi (connected via ip)
           charPreviousCommand = 'W';
           break;
+
+          case 'O': //turn device on
+          //i want these NOT added to tempNum
+          break;
+
+          case 'F': //turn device off
+          break;
         }
       }
       else{
         tempNum += value;
+        commandState = value; //this should end up with either 'O' or 'F'
       }
     }
     switch(charPreviousCommand){
@@ -105,11 +114,11 @@ void runDevice(String info){
           int num = tempNum.toInt();
           if(connectedDevice.getPin() == num){
             String tempState = connectedDevice.getState();
-            if(connectedDevice.getState() == "OFF"){
+            if(connectedDevice.getState() == "OFF" && commandState == 'O'){
               connectedDevice.setState("ON");
               digitalWrite(connectedDevice.getPin(), HIGH);
             }
-            else{
+            else if(connectedDevice.getState() == "ON" && commandState == 'F'){
               connectedDevice.setState("OFF");
               digitalWrite(connectedDevice.getPin(), LOW);
             }
@@ -151,8 +160,12 @@ void setup(){
   }
 }
 void loop(){
-  interpretCommand("RM25");
+  interpretCommand("RM25O");
   delay(2000);
-  interpretCommand("RM25");
+  interpretCommand("RM25O");
+  delay(2000);
+  interpretCommand("RM25F");
+  delay(2000);
+  interpretCommand("RM25F");
   delay(2000);
 }
