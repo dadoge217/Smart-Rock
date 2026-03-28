@@ -16,10 +16,15 @@
     <div style="display: flex; justify-content: space-between;">
         <div>
             <p style="color: aliceblue; font-family: monospace; font-size: 30px; margin-right: 10px;">About Your Smart Rock</p>
-            <div style="background-color: rgb(205, 113, 48); margin-right: 10px; border-radius: 20px;">
-                <p></p>
-                <p style="color: aliceblue; font-family: monospace; font-size: 30px; margin-right: 10px;">DEMO</p>
-                <p></p>
+            <div style="background-color: rgb(205, 113, 48); margin-right: 10px; border-radius: 20px; display: flex; justify-content: center; flex-direction: column;">
+                <p style="color: aliceblue; font-family: monospace; font-size: 30px;">Your Smart Rock IP</p>
+                <form id="rockip" action="/" method="POST">
+                    <label for="rockip" style="color: aliceblue; font-family: monospace;">Rock IP Address:</label>
+                    <input type="text" id="rockip" name="username" required>
+                    <button type="submit" styl>Connect</button>
+                </form>
+
+
             </div>
         </div>
         <div>
