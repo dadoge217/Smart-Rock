@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request
+import werkzeug
 
 app = Flask(__name__)
 
@@ -10,14 +11,17 @@ def home():
     if request.method == 'GET':
         return render_template('index.html', dstatus=status, dmood = mood, dcomp = companionMode)
     if request.method == 'POST':
-        mode = request.form['connection_mode']
-        ip = request.form['ip']
-        if mode == 'motor':
-            ip="PM"+ip
-        if mode == 'wifi':
-            ip="PW"+ip
-        print(ip)
-        status = "Connected!"
+        try:
+            mode = request.form['connection_mode']
+            ip = request.form['ip']
+            if mode == 'motor':
+                ip="PM"+ip
+            if mode == 'wifi':
+                ip="PW"+ip
+            print(ip)
+            status = "Connected!"
+        except werkzeug.exceptions.BadRequestKeyError:
+            print("bad")
         return render_template('index.html', dstatus = status, dmood = mood, dcomp = companionMode)
 
 @app.route("/menu")
