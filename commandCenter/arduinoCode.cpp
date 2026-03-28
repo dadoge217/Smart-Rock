@@ -8,7 +8,6 @@ class ConnectedDevice{
 public:
     ConnectedDevice(){}
     void connectDevice(String info);
-    void runDevice(String info);
     int getPin(){return pin;}
     String getIP(){return ip;}
     String getState(){return state;}
@@ -80,7 +79,7 @@ void ConnectedDevice::connectDevice(String info){ //Format: ConnectionType.ip/pi
     state = "OFF"; //Don't run yet
 }
 
-void ConnectedDevice::runDevice(String info){
+void runDevice(String info){
   char charPreviousCommand = '\0';
   String tempNum; //For storing pinNumber
   for(int i = 0; i < info.length(); i++){
@@ -124,7 +123,6 @@ void ConnectedDevice::runDevice(String info){
           }
         }
       }
-    }
   tempNum = "";
 }
 
