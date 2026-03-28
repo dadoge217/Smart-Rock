@@ -81,6 +81,51 @@ void ConnectedDevice::connectDevice(String info){ //Format: ConnectionType.ip/pi
 }
 
 void ConnectedDevice::runDevice(String info){
+  char charPreviousCommand = '\0';
+  String tempNum; //For storing pinNumber
+  for(int i = 0; i < info.length(); i++){
+      char value = info.charAt(i); //Get current char
+      if(value >= 'A' && value <= 'Z'){
+        switch(value){
+          case 'M': //Motor (manually plugged in)
+          charPreviousCommand = 'M';
+          break;
+          
+          case 'W': //WiFi (connected via ip)
+          charPreviousCommand = 'W';
+          break;
+        }
+      }
+      else{
+        tempNum += value;
+      }
+    }
+    switch(charPreviousCommand){
+      case 'M':
+        for(ConnectedDevice& connectedDevice : connectedDevices){
+          int num = tempNum.toInt();
+          if(connectedDevice.getPin() == num){
+            String tempState = connectedDevice.getState();
+            if(connectedDevice.getState() == "OFF"){
+              connectedDevice.setState("ON");
+              digitalWrite(connectedDevice.getPin(), HIGH);
+            }
+            else{
+              connectedDevice.setState("OFF");
+              digitalWrite(connectedDevice.getPin(), LOW);
+            }
+          }
+        }
+      break;
+      case 'W':
+        for(ConnectedDevice& connectedDevice : connectedDevices){
+          if(connectedDevice.getIP() == tempNum){
+            //Run whatever you want
+          }
+        }
+      }
+    }
+  tempNum = "";
 }
 
 void interpretCommand(String info){
@@ -91,54 +136,7 @@ void interpretCommand(String info){
     connectedDevices.push_back(newDevice);
   }
   else if (value == 'R'){
-    char charPreviousCommand = '\0';
-    String tempNum; //For storing pinNumber
-    for(int i = 0; i < info.length(); i++){
-        char value = info.charAt(i); //Get current char
-        if(value >= 'A' && value <= 'Z'){
-            switch(value){
-                case 'M': //Motor (manually plugged in)
-                charPreviousCommand = 'M';
-                break;
-                
-                case 'W': //WiFi (connected via ip)
-                charPreviousCommand = 'W';
-                break;
-            }
-        }
-        else{
-          tempNum += value;
-            switch(charPreviousCommand){
-                case 'M':
-                if (i + 1 >= info.length() || isUpperCase(info.charAt(i+1))) {
-                    for(ConnectedDevice& connectedDevice : connectedDevices){
-                      int num = tempNum.toInt();
-                      if(connectedDevice.getPin() == num){
-                        String tempState = connectedDevice.getState();
-                        if(connectedDevice.getState() == "OFF"){
-                          connectedDevice.setState("ON");
-                          digitalWrite(connectedDevice.getPin(), HIGH);
-                        }
-                        else{
-                          connectedDevice.setState("OFF");
-                          digitalWrite(connectedDevice.getPin(), LOW);
-                        }
-                      }
-                    }
-                }
-                break;
-                case 'W':
-                if (i + 1 >= info.length() || isUpperCase(info.charAt(i+1))) {
-                    for(ConnectedDevice& connectedDevice : connectedDevices){
-                      if(connectedDevice.getIP() == tempNum){
-                        //Run whatever you want
-                      }
-                    }
-                }
-            }
-        }
-    }
-    tempNum = "";
+    runDevice(info);
   }
 }
 
