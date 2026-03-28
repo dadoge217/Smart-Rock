@@ -96,16 +96,17 @@ void runDevice(String info){
           break;
 
           case 'O': //turn device on
+          commandState = 'O';
           //i want these NOT added to tempNum
           break;
 
           case 'F': //turn device off
+          commandState = 'F';
           break;
         }
       }
       else{
         tempNum += value;
-        commandState = value; //this should end up with either 'O' or 'F'
       }
     }
     switch(charPreviousCommand){
