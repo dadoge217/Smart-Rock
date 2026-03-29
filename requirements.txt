@@ -2,3 +2,5 @@ flask
 playsound3
 realtimeSTT
 aioesphomeapi
+dotenv
+pyttsx3
