@@ -8,7 +8,6 @@ class ConnectedDevice{
 public:
     ConnectedDevice(){}
     void connectDevice(String info);
-    void runDevice(String info);
     int getPin(){return pin;}
     String getIP(){return ip;}
     String getState(){return state;}
@@ -80,7 +79,61 @@ void ConnectedDevice::connectDevice(String info){ //Format: ConnectionType.ip/pi
     state = "OFF"; //Don't run yet
 }
 
-void ConnectedDevice::runDevice(String info){
+void runDevice(String info){
+  char charPreviousCommand = '\0';
+  char commandState = '\0';
+  String tempNum; //For storing pinNumber
+  for(int i = 0; i < info.length(); i++){
+      char value = info.charAt(i); //Get current char
+      if(value >= 'A' && value <= 'Z'){
+        switch(value){
+          case 'M': //Motor (manually plugged in)
+          charPreviousCommand = 'M';
+          break;
+          
+          case 'W': //WiFi (connected via ip)
+          charPreviousCommand = 'W';
+          break;
+
+          case 'O': //turn device on
+          commandState = 'O';
+          //i want these NOT added to tempNum
+          break;
+
+          case 'F': //turn device off
+          commandState = 'F';
+          break;
+        }
+      }
+      else{
+        tempNum += value;
+      }
+    }
+    switch(charPreviousCommand){
+      case 'M':
+        for(ConnectedDevice& connectedDevice : connectedDevices){
+          int num = tempNum.toInt();
+          if(connectedDevice.getPin() == num){
+            String tempState = connectedDevice.getState();
+            if(connectedDevice.getState() == "OFF" && commandState == 'O'){
+              connectedDevice.setState("ON");
+              digitalWrite(connectedDevice.getPin(), HIGH);
+            }
+            else if(connectedDevice.getState() == "ON" && commandState == 'F'){
+              connectedDevice.setState("OFF");
+              digitalWrite(connectedDevice.getPin(), LOW);
+            }
+          }
+        }
+      break;
+      case 'W':
+        for(ConnectedDevice& connectedDevice : connectedDevices){
+          if(connectedDevice.getIP() == tempNum){
+            //Run whatever you want
+          }
+        }
+      }
+  tempNum = "";
 }
 
 void interpretCommand(String info){
@@ -91,54 +144,7 @@ void interpretCommand(String info){
     connectedDevices.push_back(newDevice);
   }
   else if (value == 'R'){
-    char charPreviousCommand = '\0';
-    String tempNum; //For storing pinNumber
-    for(int i = 0; i < info.length(); i++){
-        char value = info.charAt(i); //Get current char
-        if(value >= 'A' && value <= 'Z'){
-            switch(value){
-                case 'M': //Motor (manually plugged in)
-                charPreviousCommand = 'M';
-                break;
-                
-                case 'W': //WiFi (connected via ip)
-                charPreviousCommand = 'W';
-                break;
-            }
-        }
-        else{
-          tempNum += value;
-            switch(charPreviousCommand){
-                case 'M':
-                if (i + 1 >= info.length() || isUpperCase(info.charAt(i+1))) {
-                    for(ConnectedDevice& connectedDevice : connectedDevices){
-                      int num = tempNum.toInt();
-                      if(connectedDevice.getPin() == num){
-                        String tempState = connectedDevice.getState();
-                        if(connectedDevice.getState() == "OFF"){
-                          connectedDevice.setState("ON");
-                          digitalWrite(connectedDevice.getPin(), HIGH);
-                        }
-                        else{
-                          connectedDevice.setState("OFF");
-                          digitalWrite(connectedDevice.getPin(), LOW);
-                        }
-                      }
-                    }
-                }
-                break;
-                case 'W':
-                if (i + 1 >= info.length() || isUpperCase(info.charAt(i+1))) {
-                    for(ConnectedDevice& connectedDevice : connectedDevices){
-                      if(connectedDevice.getIP() == tempNum){
-                        //Run whatever you want
-                      }
-                    }
-                }
-            }
-        }
-    }
-    tempNum = "";
+    runDevice(info);
   }
 }
 
@@ -155,8 +161,12 @@ void setup(){
   }
 }
 void loop(){
-  interpretCommand("RM25");
+  interpretCommand("RM25O");
   delay(2000);
-  interpretCommand("RM25");
+  interpretCommand("RM25O");
+  delay(2000);
+  interpretCommand("RM25F");
+  delay(2000);
+  interpretCommand("RM25F");
   delay(2000);
 }
