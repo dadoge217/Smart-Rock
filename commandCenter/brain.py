@@ -1,19 +1,14 @@
 from RealtimeSTT import AudioToTextRecorder
 from time import sleep
 from playsound3 import playsound
-
-# Play a local sound file (use the full path to your file)
-# playsound("/path/to/your/sound/file.mp3")
-
-# Play a sound asynchronously (in the background)
-# sound = playsound("/path/to/your/other/sound/file.wav", block=False)
-# if sound.is_alive():
-    # print("Sound is playing in the background!")
-    # Do other work here while the sound plays
-    # time.sleep(2)
-    # sound.stop() # Stop the sound whenever you like
+import random
 
 wake_word = "smart rock"
+#moods
+#0 - happy
+#5 - irritated
+#10 - angry
+#15 - superAngry
 
 # flag words
 # play, turn on/off, make, tell
@@ -102,6 +97,9 @@ def execute_command(action, topic):
         case _:
             print("No action")
 
+def be_angry():
+    print("BEING ANGRY")
+
 def parse_command(command):
     split_char = " "
     tokens = command.split(split_char)
@@ -117,14 +115,35 @@ class SmartRockBrain:
     def __init__(self, recorder, port=None):
         self.port = port
         self.state = "IDLE"
+        self.counter = 0 #counter to increase limit
+        self.limit = 0 #likelihood of angry event
         self.recorder = recorder
 
     def idle_mode(self):
         text = self.recorder.text().lower()
         print("idle")
+        self.counter += 1
+        print("counter:")
+        print(self.counter)
+        print("limit:")
+        print(self.limit)
+        if self.counter == 5:
+            if self.limit != 15:
+                self.limit += 5
+            self.counter = 0
+        check = random.randint(1, 40)
+        print("check:")
+        print(check)
+        if check < self.limit:
+            be_angry()
+            self.counter = 0
+            self.limit = 0
+
 
         if wake_word in text:
             print("Wake word detected!")
+            self.counter = 0
+            self.limit = 0
 
             # 'command' is the command after hearing "smart rock"
             parts = text.split(wake_word, 1)
