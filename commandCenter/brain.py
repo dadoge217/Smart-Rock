@@ -3,6 +3,7 @@ from time import sleep
 from smartplug import SmartPlug
 from playsound3 import playsound
 import random
+from gpiozero import PWMLED
 
 wake_word = "smart rock"
 
@@ -79,6 +80,23 @@ def execute_command(action, topic, brain):
 
 def be_angry():
     print("BEING ANGRY")
+    #motor1 = PWMLED(17)
+    #motor2 = PWMLED(27)
+    #motor3 = PWMLED(22)
+
+    while True:
+        #motor1.value = 1.0
+        #motor2.value = 1.0
+        #motor3.value = 1.0
+        sleep(3.0)
+        #motor1.value = 0.0
+        #motor2.value = 0.0
+        #motor3.value = 0.0
+        sleep(1.0)
+        text = recorder.text().lower()
+        if "i love you" in text:
+            break
+
 
 
 def parse_command(command, brain):
@@ -98,7 +116,7 @@ class SmartRockBrain:
 
         self.state = "IDLE"
         self.counter = 0
-        self.limit = 0
+        self.limit = 00
 
     def idle_mode(self):
         text = self.recorder.text().lower()
