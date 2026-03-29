@@ -177,9 +177,9 @@ if __name__ == "__main__":
     recorder = AudioToTextRecorder()
 
     # Smart plug connection
-    light_plug = SmartPlug("192.168.137.92")
+    light_plug = SmartPlug("192.168.137.58")
     sleep(2)
-    coffee_plug = SmartPlug("192.168.137.186")
+    coffee_plug = SmartPlug("192.168.137.64")
 
     brain = SmartRockBrain(recorder, light_plug, coffee_plug)
 
