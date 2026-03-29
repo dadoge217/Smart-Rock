@@ -1,130 +1,133 @@
 from RealtimeSTT import AudioToTextRecorder
 from time import sleep
+from smartplug import SmartPlug
 from playsound3 import playsound
-
-# Play a local sound file (use the full path to your file)
-# playsound("/path/to/your/sound/file.mp3")
-
-# Play a sound asynchronously (in the background)
-# sound = playsound("/path/to/your/other/sound/file.wav", block=False)
-# if sound.is_alive():
-    # print("Sound is playing in the background!")
-    # Do other work here while the sound plays
-    # time.sleep(2)
-    # sound.stop() # Stop the sound whenever you like
+import random
 
 wake_word = "smart rock"
 
-# flag words
-# play, turn on/off, make, tell
-flag_words = [
-    "on",
-    "off",
-    "play",
-    "stop",
-    "make",
-    "tell"
-]
+flag_words = ["on ", "off ", "play ", "stop ", "make ", "tell ", "cup "]
 
-# topic words
-# jokes, lights, coffee, timer, weather, fun fact
 topic_words = [
     "light",
     "coffee",
     "timer",
     "weather",
     "joke",
+    "joe",
     "evanescence",
     "radiohead",
     "my chemical romance",
     "cranberries"
 ]
 
-def execute_command(action, topic):
+
+def execute_command(action, topic, brain):
     match action:
         case "on ":
             if topic == "light":
-                # execute light_on
-                print("light on")
-            else:
-                print(action, "no corresponding topic:", topic)
+                print("Turning light ON")
+                brain.light_plug.turn_on()
+            elif topic == "coffee":
+                print("Turning coffee ON")
+                brain.coffee_plug.turn_on()
 
         case "off ":
             if topic == "light":
-                print("light off")
-            elif topic == "coffee":   
-                print("turning off coffee")
-            elif topic == "song":  
-                print("stopping music")
-            else:
-                print(action, "no corresponding topic:", topic)
+                print("Turning light OFF")
+                brain.light_plug.turn_off()
+            elif topic == "coffee":
+                print("Turning coffee OFF")
+                brain.coffee_plug.turn_off()
+        
+        case "cup ":
+            if topic == "joe":
+                print("Starting coffee pot")
+                brain.coffee_plug.toggle()
+
+        case "toggle ":
+            if topic == "light":
+                print("Toggling light")
+                brain.light_plug.toggle()
 
         case "play ":
             if topic == "evanescence":
-                sound = playsound(r"C:\Users\ninea\OneDrive\Documents\GitHub\Smart-Rock\sounds\songs\Wake_Grug_Up_In_Cave.wav")
+                playsound(r"sounds/songs/Wake_Grug_Up_In_Cave.wav")
             elif topic == "radiohead":
-                sound = playsound(r"C:\Users\ninea\OneDrive\Documents\GitHub\Smart-Rock\sounds\songs\Grug.wav")
+                playsound(r"sounds/songs/Grug.wav")
             elif topic == "my chemical romance":
-                sound = playsound(r"C:\Users\ninea\OneDrive\Documents\GitHub\Smart-Rock\sounds\songs\Cavechildren.wav")
+                playsound(r"sounds/songs/Cavechildren.wav")
             elif topic == "cranberries":
-                sound = playsound(r"C:\Users\ninea\OneDrive\Documents\GitHub\Smart-Rock\sounds\songs\Mammoth.wav")
-            else:
-                print(action, "no corresponding topic:", topic)
+                playsound(r"sounds/songs/Mammoth.wav")
 
-        case "stop ":
-            if topic == "coffee":
-                print("stopping coffee pot")
-            elif topic == "song":
-                sound.stop()
-            elif topic == "timer":
-                print("stopping timer")
-            else:
-                print(action, "no corresponding topic:", topic)
+        case "off ":
+            if topic == "song":
+                print("Stopping music")
 
         case "make ":
             if topic == "coffee":
-                print("starting coffee pot")
-            elif topic == "timer":
-                print("starting timer")
-            elif topic == "joke":
-                print("telling joke")
-            else:
-                print(action, "no corresponding topic:", topic)
+                print("Starting coffee pot")
+                brain.coffee_plug.toggle()
 
         case "tell ":
             if topic == "joke":
-                print("telling joke")
-            elif topic == "weather":
-                print("telling weather")
-            else:
-                print(action, "no corresponding topic:", topic)
-            
+                print("Telling joke")
+
         case _:
-            print("No action")
+            print("No action found")
 
-def parse_command(command):
-    split_char = " "
-    tokens = command.split(split_char)
 
+def be_angry():
+    print("BEING ANGRY")
+
+
+def parse_command(command, brain):
     for flag in flag_words:
         if flag in command:
-            flag = flag+" "
+            flag = flag
             for topic in topic_words:
                 if topic in command:
-                    execute_command(flag, topic)
+                    execute_command(flag, topic, brain)
+
 
 class SmartRockBrain:
-    def __init__(self, recorder, port=None):
-        self.port = port
-        self.state = "IDLE"
+    def __init__(self, recorder, smart_plug1, smart_plug2):
         self.recorder = recorder
+        self.light_plug = smart_plug1
+        self.coffee_plug = smart_plug2
+
+        self.state = "IDLE"
+        self.counter = 0
+        self.limit = 0
 
     def idle_mode(self):
         text = self.recorder.text().lower()
         print("idle")
+        self.counter += 1
+        print("counter:")
+        print(self.counter)
+        print("limit:")
+        print(self.limit)
+        if self.counter == 5:
+            if self.limit != 15:
+                self.limit += 5
+                xlimit = self.limit
+            self.counter = 0
+        check = random.randint(1, 40)
+        print("check:")
+        print(check)
+        if check < self.limit:
+            be_angry()
+            self.counter = 0
+            self.limit = 0
+            xlimit = self.limit
+
 
         if wake_word in text:
             print("Wake word detected!")
+            self.counter = 0
+            self.limit = 0
+            xlimit = self.limit
 
             # 'command' is the command after hearing "smart rock"
             parts = text.split(wake_word, 1)
@@ -132,9 +135,10 @@ class SmartRockBrain:
 
             if command:
                 print("Command:", command)
-                parse_command(command)
+                parse_command(command, self)
             else:
                 self.state = "ACTIVE"
+
 
     def active_mode(self):
         print("Listening for command...")
@@ -147,6 +151,7 @@ class SmartRockBrain:
             sleep(0.1)
 
         print("Command:", final_text.strip())
+        parse_command(final_text, self)
         self.state = "IDLE"
 
     def run(self):
@@ -156,10 +161,15 @@ class SmartRockBrain:
             self.active_mode()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     recorder = AudioToTextRecorder()
-    smartRock = SmartRockBrain(recorder)
+
+    # 🔌 Smart plug connection
+    light_plug = SmartPlug("192.168.137.92")
+    coffee_plug = SmartPlug("192.168.137.186")
+
+    brain = SmartRockBrain(recorder, light_plug, coffee_plug)
 
     while True:
-        smartRock.run()
+        brain.run()
         sleep(0.1)
