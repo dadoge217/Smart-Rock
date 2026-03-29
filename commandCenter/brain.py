@@ -1,5 +1,17 @@
 from RealtimeSTT import AudioToTextRecorder
 from time import sleep
+from playsound3 import playsound
+
+# Play a local sound file (use the full path to your file)
+# playsound("/path/to/your/sound/file.mp3")
+
+# Play a sound asynchronously (in the background)
+# sound = playsound("/path/to/your/other/sound/file.wav", block=False)
+# if sound.is_alive():
+    # print("Sound is playing in the background!")
+    # Do other work here while the sound plays
+    # time.sleep(2)
+    # sound.stop() # Stop the sound whenever you like
 
 wake_word = "smart rock"
 
@@ -22,19 +34,22 @@ topic_words = [
     "timer",
     "weather",
     "joke",
-    "song"
+    "evanescence",
+    "radiohead",
+    "my chemical romance",
+    "cranberries"
 ]
 
 def execute_command(action, topic):
     match action:
-        case "on":
+        case "on ":
             if topic == "light":
                 # execute light_on
                 print("light on")
             else:
                 print(action, "no corresponding topic:", topic)
 
-        case "off":
+        case "off ":
             if topic == "light":
                 print("light off")
             elif topic == "coffee":   
@@ -44,23 +59,29 @@ def execute_command(action, topic):
             else:
                 print(action, "no corresponding topic:", topic)
 
-        case "play":
-            if topic == "song":
-                print("playing song")
+        case "play ":
+            if topic == "evanescence":
+                sound = playsound(r"C:\Users\ninea\OneDrive\Documents\GitHub\Smart-Rock\sounds\songs\Wake_Grug_Up_In_Cave.wav")
+            elif topic == "radiohead":
+                sound = playsound(r"C:\Users\ninea\OneDrive\Documents\GitHub\Smart-Rock\sounds\songs\Grug.wav")
+            elif topic == "my chemical romance":
+                sound = playsound(r"C:\Users\ninea\OneDrive\Documents\GitHub\Smart-Rock\sounds\songs\Cavechildren.wav")
+            elif topic == "cranberries":
+                sound = playsound(r"C:\Users\ninea\OneDrive\Documents\GitHub\Smart-Rock\sounds\songs\Mammoth.wav")
             else:
                 print(action, "no corresponding topic:", topic)
 
-        case "stop":
+        case "stop ":
             if topic == "coffee":
                 print("stopping coffee pot")
             elif topic == "song":
-                print("stopping song")
+                sound.stop()
             elif topic == "timer":
                 print("stopping timer")
             else:
                 print(action, "no corresponding topic:", topic)
 
-        case "make":
+        case "make ":
             if topic == "coffee":
                 print("starting coffee pot")
             elif topic == "timer":
@@ -70,7 +91,7 @@ def execute_command(action, topic):
             else:
                 print(action, "no corresponding topic:", topic)
 
-        case "tell":
+        case "tell ":
             if topic == "joke":
                 print("telling joke")
             elif topic == "weather":
@@ -87,6 +108,7 @@ def parse_command(command):
 
     for flag in flag_words:
         if flag in command:
+            flag = flag+" "
             for topic in topic_words:
                 if topic in command:
                     execute_command(flag, topic)
