@@ -5,6 +5,7 @@ from playsound3 import playsound
 from amazonapi import call_caveman_ai
 import pyttsx3
 import random
+from gpiozero import PWMLED
 
 wake_word = "smart rock"
 
@@ -59,13 +60,13 @@ def execute_command(action, topic, brain):
 
         case "play ":
             if topic == "evanescence":
-                playsound(r"sounds/songs/Wake_Grug_Up_In_Cave.wav")
+                playsound(r"assets/songs/Wake_Grug_Up_In_Cave.wav")
             elif topic == "radiohead":
-                playsound(r"sounds/songs/Grug.wav")
+                playsound(r"assets/songs/Grug.wav")
             elif topic == "my chemical romance":
-                playsound(r"sounds/songs/Cavechildren.wav")
+                playsound(r"assets/songs/Cavechildren.wav")
             elif topic == "cranberries":
-                playsound(r"sounds/songs/Mammoth.wav")
+                playsound(r"assets/songs/Mammoth.wav")
 
         case "make ":
             if topic == "coffee":
@@ -83,6 +84,23 @@ def execute_command(action, topic, brain):
 
 def be_angry():
     print("BEING ANGRY")
+    #motor1 = PWMLED(17)
+    #motor2 = PWMLED(27)
+    #motor3 = PWMLED(22)
+
+    while True:
+        #motor1.value = 1.0
+        #motor2.value = 1.0
+        #motor3.value = 1.0
+        sleep(3.0)
+        #motor1.value = 0.0
+        #motor2.value = 0.0
+        #motor3.value = 0.0
+        sleep(1.0)
+        text = recorder.text().lower()
+        if "i love you" in text:
+            break
+
 
 
 def parse_command(command, brain):
@@ -110,7 +128,7 @@ class SmartRockBrain:
 
         self.state = "IDLE"
         self.counter = 0
-        self.limit = 0
+        self.limit = 00
 
     def idle_mode(self):
         text = self.recorder.text().lower()
