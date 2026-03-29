@@ -2,6 +2,8 @@ from RealtimeSTT import AudioToTextRecorder
 from time import sleep
 from smartplug import SmartPlug
 from playsound3 import playsound
+from amazonapi import call_caveman_ai
+import pyttsx3
 import random
 from gpiozero import PWMLED
 
@@ -22,6 +24,11 @@ topic_words = [
     "cranberries"
 ]
 
+def speak(text):
+    engine = pyttsx3.init()
+    engine.say(text)
+    engine.runAndWait()
+    engine.stop()
 
 def execute_command(action, topic, brain):
     match action:
@@ -61,10 +68,6 @@ def execute_command(action, topic, brain):
             elif topic == "cranberries":
                 playsound(r"assets/songs/Mammoth.wav")
 
-        case "off ":
-            if topic == "song":
-                print("Stopping music")
-
         case "make ":
             if topic == "coffee":
                 print("Starting coffee pot")
@@ -73,6 +76,7 @@ def execute_command(action, topic, brain):
         case "tell ":
             if topic == "joke":
                 print("Telling joke")
+
 
         case _:
             print("No action found")
@@ -100,12 +104,20 @@ def be_angry():
 
 
 def parse_command(command, brain):
+    response = call_caveman_ai(command)
+    text = response
+
+    # Try to execute command
     for flag in flag_words:
         if flag in command:
-            flag = flag
             for topic in topic_words:
                 if topic in command:
                     execute_command(flag, topic, brain)
+                    break
+
+    # ALWAYS speak SmartRock response
+    print("SmartRock:", text)
+    speak(text)
 
 
 class SmartRockBrain:
@@ -182,9 +194,10 @@ class SmartRockBrain:
 if __name__ == "__main__":
     recorder = AudioToTextRecorder()
 
-    # 🔌 Smart plug connection
-    light_plug = SmartPlug("192.168.137.92")
-    coffee_plug = SmartPlug("192.168.137.186")
+    # Smart plug connection
+    light_plug = SmartPlug("192.168.137.58")
+    sleep(2)
+    coffee_plug = SmartPlug("192.168.137.64")
 
     brain = SmartRockBrain(recorder, light_plug, coffee_plug)
 
