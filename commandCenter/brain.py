@@ -52,13 +52,13 @@ def execute_command(action, topic, brain):
 
         case "play ":
             if topic == "evanescence":
-                playsound(r"sounds/songs/Wake_Grug_Up_In_Cave.wav")
+                playsound(r"assets/songs/Wake_Grug_Up_In_Cave.wav")
             elif topic == "radiohead":
-                playsound(r"sounds/songs/Grug.wav")
+                playsound(r"assets/songs/Grug.wav")
             elif topic == "my chemical romance":
-                playsound(r"sounds/songs/Cavechildren.wav")
+                playsound(r"assets/songs/Cavechildren.wav")
             elif topic == "cranberries":
-                playsound(r"sounds/songs/Mammoth.wav")
+                playsound(r"assets/songs/Mammoth.wav")
 
         case "off ":
             if topic == "song":
